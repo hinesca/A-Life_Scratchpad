@@ -13,4 +13,4 @@ This is a space for trying out new ideas in preparation for A-Life Challenge 2.0
 | Project management tool(s) (spreadsheet, Trello, Monday, Basecamp, Asana, Jira, etc) | Trello or GitHub Boards (very little overhead) |
 | Code repo (github vs gitlab vs bitbucket?) | GitHub |
 | Work Quality | Test Driven Development (when it makes sense). Code reviews as part of the weekly meeting. Adhere to applicable code standards. (e.g. PEP 8, .NET Conventions, etc. ) |
-| Conflict management (what will you do if there is disagreement on how to proceed?) | Collaborate, Democratize (if necessary), then commit to a decision | 
+| Conflict management (what will you do if there is disagreement on how to proceed?) | Collaborate, Democratize (if necessary), then commit to a decision |

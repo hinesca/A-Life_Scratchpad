@@ -1,16 +1,17 @@
 # A-Life Scratchpad
 
-This is a space for trying out new ideas in preparation for A-Life Challenge 2.0 Capstone project.
+This is a space for trying out new ideas related to Artificial Life.
 
-## Team Standards
+## Simulator Core Architecture
 
-| Category | Standard |
-| - | :- |
-| Project Goals | Create a comprehensive, highly configurable, simulation of simple life and evolution. |
-| Communication (asynchronous and synchronous). List desired frequency. | Using MS Teams with asynchronous and synchronous mix (1 – 2 meetings a week with regular updates over chat)  |
-| Meeting logistics and preparation (roles? responsibilities?) | Ad-Hoc and Agile. Special meetings, like a map day, should have more structure with a driver. |
-| Types of meetings (sprint, standup, design, code, review, etc) | 1 Map-day (project plan), regular standup, weekly meeting. |
-| Project management tool(s) (spreadsheet, Trello, Monday, Basecamp, Asana, Jira, etc) | Trello or GitHub Boards (very little overhead) |
-| Code repo (github vs gitlab vs bitbucket?) | GitHub |
-| Work Quality | Test Driven Development (when it makes sense). Code reviews as part of the weekly meeting. Adhere to applicable code standards. (e.g. PEP 8, .NET Conventions, etc. ) |
-| Conflict management (what will you do if there is disagreement on how to proceed?) | Collaborate, Democratize (if necessary), then commit to a decision |
+The sim core will be prototyped in python. It will provide an API to be used with an abstract visualization project, an event logger, and a custom real time event system to interface with an abstract model project.
+
+It will hold a collection of all of the simulation model objects. On initialization, it will initialize an abstract model object that represents the initial conditions of the simulation. It will schedule abstract events defined by the model objects, and detect collisions that will trigger an abstract interaction between colliding objects.
+
+## Model Architecture
+
+The model will start from of a class who's constructor will initialize the initial conditions of the simulation by instantiating all of the physical object models needed to start the particular simulation.
+
+The physical object models will store their own state information in private backing fields and have methods (or properties) that calculate the future or current state of the object based on the stored intermediate state. For example, the abstract class (or interface) for physical object models will require each object model to implement a GetPosition method that returns it's position (or implement a property to do the same thing). If the object moves, there will be a state variable (backing field) for the trajectory of the object over time. This may be in the form of an equation or a list of positions tracing a path. The position at any given time can then be calculated from this intermediate trajectory. This will avoid having the need to calculate the state of each model object on each time step in the simulation which may be very small.
+
+

@@ -1,12 +1,11 @@
 # SimCore.py
-# Author Casey Hines October 2021
+# Author: Casey Hines October 2021
 
 # For simplicity and to get a working simulation, we are treating vpython as the view
 import vpython as view
 import time
-import asyncio
 from abc import ABC, abstractmethod
-import random
+import simHelper
 
 # Simple representation of time in seconds after epoch
 # TODO: think about different implementation
@@ -50,25 +49,25 @@ class TestObjectFactory(PhysicalObjectBase):
     def __init__(self, realTimeEngin, id, trajectory):
         super().__init__(realTimeEngin, id, trajectory)
         global now
-        rateModifier = 1
-        eventTime = now + random.random()
+        rateModifier = 10
+        eventTime = now + simHelper.rand()
         nextEventTime = eventTime
         for i in range(1000): # these events will fire produce()
-            nextEventTime = nextEventTime + rateModifier * random.random()
+            nextEventTime = nextEventTime + simHelper.rand(1/rateModifier)
             self.schedule.append(
-                TestObjectFactoryProduce(nextEventTime * random.random()))
+                TestObjectFactoryProduce(nextEventTime))
 
     def produce(self):
         global now
         global nextID
         point1 = self.get_position()
         maxDistance = 100 # TODO don't use magic numbers in real models
-        # TODO pass through spherical coordinates in real models to avoid diagonal bias
+        randUnitVector = simHelper.randomUnitVector() # array form
         point2 = SpaceTimePosition(
-            maxDistance * (-0.5 + random.random()),
-            maxDistance * (-0.5 + random.random()),
-            maxDistance * (-0.5 + random.random()),
-            now + 60*random.random())
+            maxDistance * (randUnitVector[0]),
+            maxDistance * (randUnitVector[1]),
+            maxDistance * (randUnitVector[2]),
+            now + 60*simHelper.rand())
         trajectory = [point1, point2]
         nextID = nextID + 1
         newObj = PhysicalObjectBase(self, nextID, trajectory)
@@ -132,6 +131,7 @@ class RealTimeEngin:
         physicalObjectCollection = [testObj]
         return physicalObjectCollection
 
+    # called on each view dt
     def step(self):
         # not sure if real_t_step is needed, vpython has built in rate()
         # that may account for the functionality I was thinking.
@@ -143,13 +143,15 @@ class RealTimeEngin:
         if len(self.physicalObjectCollection) == 0:
             return False
         for obj in self.physicalObjectCollection:
+            if obj.trajectory[-1].t < now: # obj died
+                # TODO implement death event for this so model has control.
+                self.physicalObjectCollection.remove(obj)
+                obj.visualModel.visible = False
+                del obj.visualModel # TODO this doesn't work we will need a pool
+                break
             obj.fire_events()
             objPos = obj.get_position()
             obj.visualModel.pos = objPos.sPos
-            if obj.trajectory[-1].t < now:
-                self.physicalObjectCollection.remove(obj) # obj died
-                obj.visualModel.visibility = False
-                del obj.visualModel # TODO this doesn't work we will need a pool
         return True
 
     def start(self):
@@ -160,6 +162,8 @@ class RealTimeEngin:
         now = 0
         self.get_initial_conditions()
         while (running):
+            # The view (vpython) conveniently controls the rate.
+            # TODO implement our own rate to decouple (asyncio).
             running = self.step()
 
 if __name__ == "__main__":
